@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -e
+
+repo=$1
+if [ -z "$repo" ]; then
+   echo "usage: release <repo>"
+   echo "   repo: pypi-test or pypi"
+   exit 1
+fi
+
+rm -rf ./dist
+python -m build
+twine upload -r $repo dist/*

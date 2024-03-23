@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+exec python -m pytest_watch \
+   --clear \
+   --beforerun "black --check . && flake8 . && mypy ." \
+   -- -s --hypothesis-profile=default --cov=torchstreamer

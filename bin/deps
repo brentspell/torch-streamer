@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e
+
+pip install --upgrade pip pip-tools
+
+pip-compile pyproject.toml \
+  --extra dev \
+  -o requirements.txt
+
+pip-sync requirements.txt
