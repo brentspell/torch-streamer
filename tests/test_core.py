@@ -34,18 +34,10 @@ def test_sequential1d(
     if script:
         s = pt.jit.script(s)
 
-    assert s.read() is None
-
     yc = m(x)
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-6)
-
-    assert s.read() is None
-    s.clear()
-    s.write(x)
-    s.clear()
-    assert s.read() is None
 
 
 @hypothesis.given(
@@ -71,18 +63,10 @@ def test_residual1d(
     if script:
         s = pt.jit.script(s)
 
-    assert s.read() is None
-
     yc = m(x)
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-6)
-
-    assert s.read() is None
-    s.clear()
-    s.write(x)
-    s.clear()
-    assert s.read() is None
 
 
 def test_residual1d_invalid() -> None:
@@ -125,18 +109,10 @@ def test_conv1d(
     if script:
         s = pt.jit.script(s)
 
-    assert s.read() is None
-
     yc = m(x)
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-6)
-
-    assert s.read() is None
-    s.clear()
-    s.write(x)
-    s.clear()
-    assert s.read() is None
 
 
 @hypothesis.given(
@@ -172,18 +148,10 @@ def test_conv_transpose1d(
     if script:
         s = pt.jit.script(s)
 
-    assert s.read() is None
-
     yc = m(x)
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-6)
-
-    assert s.read() is None
-    s.clear()
-    s.write(x)
-    s.clear()
-    assert s.read() is None
 
 
 @hypothesis.given(
@@ -202,18 +170,10 @@ def test_elementwise1d(
     if script:
         s = pt.jit.script(s)
 
-    assert s.read() is None
-
     yc = m(x)
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-6)
-
-    assert s.read() is None
-    s.clear()
-    s.write(x)
-    s.clear()
-    assert s.read() is None
 
 
 def test_elementwise1d_invalid() -> None:
@@ -221,7 +181,7 @@ def test_elementwise1d_invalid() -> None:
     s = pts.Elementwise1dStream(m)
 
     with pytest.raises(RuntimeError, match=r"invalid_elementwise_output"):
-        s.write(pt.zeros([CH, 2]))
+        s.process(pt.zeros([CH, 2]))
 
 
 def test_custom() -> None:
@@ -260,15 +220,11 @@ def do_stream(
     x: pt.Tensor,
     b: int,
 ) -> pt.Tensor:
-    if isinstance(stream, pts.BaseStream):
-        ys = stream.generate(x[..., i : i + b] for i in range(0, x.shape[-1], b))
-    else:
-        ys = []
-        for i in range(0, x.shape[-1], b):
-            stream.write(x[..., i : i + b])
-            if (y := stream.read()) is not None:
-                ys.append(y)
-        if (y := stream.read(final=True)) is not None:
+    ys = []
+    for i in range(0, x.shape[-1], b):
+        y = stream.process(x[..., i : i + b], final=i + b >= x.shape[-1])
+        if y is not None:
+            assert y.shape[-1] != 0
             ys.append(y)
 
     return pt.cat(list(ys), dim=-1)

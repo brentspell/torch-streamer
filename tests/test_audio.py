@@ -59,8 +59,6 @@ def test_resample(
     if script:
         s = pt.jit.script(s)
 
-    assert s.read() is None
-
     yc = pta.functional.resample(
         x,
         source_fs,
@@ -75,27 +73,17 @@ def test_resample(
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-5)
 
-    assert s.read() is None
-    s.clear()
-    s.write(x)
-    s.clear()
-    assert s.read() is None
-
 
 def do_stream(
     stream: T.Union[pts.BaseStream, pt.jit.ScriptModule],
     x: pt.Tensor,
     b: int,
 ) -> pt.Tensor:
-    if isinstance(stream, pts.BaseStream):
-        ys = stream.generate(x[..., i : i + b] for i in range(0, x.shape[-1], b))
-    else:
-        ys = []
-        for i in range(0, x.shape[-1], b):
-            stream.write(x[..., i : i + b])
-            if (y := stream.read()) is not None:
-                ys.append(y)
-        if (y := stream.read(final=True)) is not None:
+    ys = []
+    for i in range(0, x.shape[-1], b):
+        y = stream.process(x[..., i : i + b], final=i + b >= x.shape[-1])
+        if y is not None:
+            assert y.shape[-1] != 0
             ys.append(y)
 
     return pt.cat(list(ys), dim=-1)

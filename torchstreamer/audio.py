@@ -10,7 +10,6 @@ from . import core as pts
 
 class ResampleStream(pts.BaseStream):
     x_buffer: T.List[pt.Tensor]
-    y_buffer: T.List[pt.Tensor]
 
     def __init__(
         self,
@@ -50,13 +49,12 @@ class ResampleStream(pts.BaseStream):
 
         self.started = False
         self.x_buffer = []
-        self.y_buffer = []
         self.x_length = 0
         self.x_total = 0
         self.y_total = 0
 
     @pt.jit.export
-    def write(self, x: pt.Tensor) -> None:
+    def process(self, x: pt.Tensor, final: bool = False) -> T.Optional[pt.Tensor]:
         if len(x.shape) == 1:
             self.channels = 0
             x = x.unsqueeze(0)
@@ -71,9 +69,12 @@ class ResampleStream(pts.BaseStream):
         self.x_buffer.append(x)
         self.x_length += x.shape[-1]
         self.x_total += x.shape[-1]
-        self.flush()
 
-    def flush(self) -> None:
+        if final:
+            self.x_buffer.append(self.rpad.repeat(max(self.channels, 1), 1))
+            self.x_length += self.rpad.shape[-1]
+
+        y: T.Optional[pt.Tensor] = None
         if self.x_length >= self.field:
             x = pt.cat(self.x_buffer, dim=-1)
             self.x_buffer.clear()
@@ -88,24 +89,10 @@ class ResampleStream(pts.BaseStream):
                 weight=self.kernel,
                 stride=self.stride,
             )
-            self.y_buffer.append(y)
 
             self.x_buffer.append(x[..., next_:])
             self.x_length += max(x.shape[-1] - next_, 0)
 
-    @pt.jit.export
-    def read(self, final: bool = False) -> T.Optional[pt.Tensor]:
-        if final:
-            self.x_buffer.append(self.rpad.repeat(max(self.channels, 1), 1))
-            self.x_length += self.rpad.shape[-1]
-            self.flush()
-
-        y: T.Optional[pt.Tensor] = None
-        if self.y_buffer:
-            y = pt.cat(self.y_buffer, dim=-1)
-            self.y_buffer.clear()
-
-        if y is not None:
             y = y.mT.reshape(y.shape[0], -1)
             self.y_total += y.shape[-1]
 
@@ -116,13 +103,5 @@ class ResampleStream(pts.BaseStream):
 
             if self.channels == 0:
                 y = y.squeeze(0)
-        return y
 
-    @pt.jit.export
-    def clear(self) -> None:
-        self.started = False
-        self.x_buffer.clear()
-        self.y_buffer.clear()
-        self.x_length = 0
-        self.x_total = 0
-        self.y_total = 0
+        return y
