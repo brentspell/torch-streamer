@@ -271,6 +271,20 @@ def module1d_stream(net: pt.nn.Module) -> BaseStream:
     return Elementwise1dStream(net)
 
 
+def conv1d_stream(net: pt.nn.Conv1d) -> BaseStream:
+    if net.kernel_size[0] == 1 and net.stride[0] == 1:
+        return Elementwise1dStream(net)
+    else:
+        return Conv1dStream(net)
+
+
+def convtranspose1d_stream(net: pt.nn.ConvTranspose1d) -> BaseStream:
+    if net.kernel_size[0] == 1 and net.stride[0] == 1:
+        return Elementwise1dStream(net)
+    else:
+        return ConvTranspose1dStream(net)
+
+
 def register_streamer(
     module: type,
     streamer: T.Callable[[pt.nn.Module], BaseStream],
@@ -293,10 +307,10 @@ _stream_map: T.List[T.Tuple[type, T.Callable[[pt.nn.Module], BaseStream]]] = [
     ),
     (
         pt.nn.Conv1d,
-        lambda net: Conv1dStream(T.cast(pt.nn.Conv1d, net)),
+        lambda net: conv1d_stream(T.cast(pt.nn.Conv1d, net)),
     ),
     (
         pt.nn.ConvTranspose1d,
-        lambda net: ConvTranspose1dStream(T.cast(pt.nn.ConvTranspose1d, net)),
+        lambda net: convtranspose1d_stream(T.cast(pt.nn.ConvTranspose1d, net)),
     ),
 ]

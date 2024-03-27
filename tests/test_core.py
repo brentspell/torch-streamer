@@ -23,6 +23,7 @@ def test_sequential1d(
     x = pt.randn([CH, length]).clamp(-1, 1)
     m = pt.nn.Sequential(
         pt.nn.ConvTranspose1d(CH, CH, kernel_size=3, stride=2),
+        pt.nn.ConvTranspose1d(CH, CH, kernel_size=1),
         pt.nn.Conv1d(CH, CH, kernel_size=1),
         pt.nn.Conv1d(CH, 2 * CH, kernel_size=3, dilation=2),
         pt.nn.Conv1d(2 * CH, CH, kernel_size=2),
