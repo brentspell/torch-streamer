@@ -53,8 +53,7 @@ class ResampleStream(pts.BaseStream):
         self.x_total = 0
         self.y_total = 0
 
-    @pt.jit.export
-    def process(self, x: pt.Tensor, final: bool = False) -> T.Optional[pt.Tensor]:
+    def forward(self, x: pt.Tensor, final: bool = False) -> T.Optional[pt.Tensor]:
         if len(x.shape) == 1:
             self.channels = 0
             x = x.unsqueeze(0)

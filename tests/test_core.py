@@ -182,7 +182,7 @@ def test_elementwise1d_invalid() -> None:
     s = pts.Elementwise1dStream(m)
 
     with pytest.raises(RuntimeError, match=r"invalid_elementwise_output"):
-        s.process(pt.zeros([CH, 2]))
+        s(pt.zeros([CH, 2]))
 
 
 def test_custom() -> None:
@@ -223,7 +223,7 @@ def do_stream(
 ) -> pt.Tensor:
     ys = []
     for i in range(0, x.shape[-1], b):
-        y = stream.process(x[..., i : i + b], final=i + b >= x.shape[-1])
+        y = stream(x[..., i : i + b], final=i + b >= x.shape[-1])
         if y is not None:
             assert y.shape[-1] != 0
             ys.append(y)

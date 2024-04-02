@@ -7,7 +7,7 @@ import torch.nn.functional as ptf
 
 class BaseStream(pt.nn.Module, abc.ABC):
     @abc.abstractmethod
-    def process(
+    def forward(
         self,
         x: pt.Tensor,
         final: bool = False,
@@ -21,8 +21,7 @@ class Sequential1dStream(BaseStream):
 
         self.streams = pt.nn.ModuleList([module1d_stream(m) for m in net.children()])
 
-    @pt.jit.export
-    def process(
+    def forward(
         self,
         x: pt.Tensor,
         final: bool = False,
@@ -30,7 +29,7 @@ class Sequential1dStream(BaseStream):
         x_: T.Optional[pt.Tensor] = x
         for i, stream in enumerate(self.streams):
             if x_ is not None:
-                x_ = stream.process(x_, final=final)
+                x_ = stream(x_, final=final)
         return x_
 
 
@@ -55,14 +54,13 @@ class Residual1dStream(BaseStream):
         self.x_buffer = []
         self.x_offset = 0
 
-    @pt.jit.export
-    def process(
+    def forward(
         self,
         x: pt.Tensor,
         final: bool = False,
     ) -> T.Optional[pt.Tensor]:
         self.x_buffer.append(x)
-        y = self.stream.process(x, final=final)
+        y = self.stream(x, final=final)
 
         if y is not None:
             x = pt.cat(self.x_buffer, dim=-1)
@@ -130,8 +128,7 @@ class Conv1dStream(BaseStream):
         o, i, k = self.weight.shape
         return f"Conv1dStream({i}, {o}, kernel_size={k}, stride={self.stride})"
 
-    @pt.jit.export
-    def process(
+    def forward(
         self,
         x: pt.Tensor,
         final: bool = False,
@@ -200,8 +197,7 @@ class ConvTranspose1dStream(BaseStream):
         i, o, k = self.weight.shape
         return f"ConvTranspose1dStream({i}, {o}, kernel_size={k}, stride={self.stride})"
 
-    @pt.jit.export
-    def process(
+    def forward(
         self,
         x: pt.Tensor,
         final: bool = False,
@@ -249,8 +245,7 @@ class Elementwise1dStream(BaseStream):
 
         self.net = net
 
-    @pt.jit.export
-    def process(
+    def forward(
         self,
         x: pt.Tensor,
         final: bool = False,
