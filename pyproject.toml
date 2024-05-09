@@ -25,6 +25,7 @@ optional-dependencies.dev = [
    "pre-commit",
    "pytest-watch",
    "twine",
+   "typos",
    "wheel",
 
    # testing

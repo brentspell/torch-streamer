@@ -27,5 +27,6 @@ jobs:
           pytest --hypothesis-profile=ci --cov=torchstreamer
           black .
           flake8 .
+          typos
           mypy .
           coveralls

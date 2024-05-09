@@ -155,6 +155,8 @@ typing-extensions==4.10.0
     # via
     #   mypy
     #   torch
+typos==1.21.0
+    # via torch-streamer (pyproject.toml)
 urllib3==2.2.1
     # via
     #   requests

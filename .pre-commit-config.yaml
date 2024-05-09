@@ -23,6 +23,10 @@ repos:
         language: system
         entry: flake8
         types: [python]
+      - id: typos
+        name: typos
+        language: system
+        entry: typos
       - id: mypy
         name: mypy
         language: system
