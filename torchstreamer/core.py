@@ -239,6 +239,68 @@ class ConvTranspose1dStream(BaseStream):
         return y if y.shape[-1] != 0 else None
 
 
+class Pool1dStream(BaseStream):
+    x_buffer: T.List[pt.Tensor]
+
+    def __init__(self, net: T.Union[pt.nn.AvgPool1d, pt.nn.MaxPool1d]):
+        super().__init__()
+
+        if isinstance(net, pt.nn.AvgPool1d):
+            self.pool_type = "Avg"
+        elif isinstance(net, pt.nn.MaxPool1d):
+            self.pool_type = "Max"
+        else:
+            raise ValueError("invalid_pool_module")
+
+        k, s = net.kernel_size, net.stride
+        self.field = k[0] if isinstance(k, tuple) else k
+        self.stride = s[0] if isinstance(s, tuple) else s
+
+        self.x_buffer = []
+        self.x_length = 0
+        self.x_skip = 0
+
+    def __repr__(self) -> str:
+        t, f, s = self.pool_type, self.field, self.stride
+        return f"{t}Pool1dStream(kernel_size={f}, stride={s})"
+
+    def forward(
+        self,
+        x: pt.Tensor,
+        final: bool = False,
+    ) -> T.Optional[pt.Tensor]:
+        y: T.Optional[pt.Tensor] = None
+        self.x_buffer.append(x)
+        self.x_length += x.shape[-1]
+        if self.x_length - self.x_skip >= self.field:
+            x = pt.cat(self.x_buffer, dim=-1)[..., self.x_skip :]
+            self.x_buffer.clear()
+            self.x_length = 0
+
+            steps = (x.shape[-1] - self.field) // self.stride
+            valid = self.field + steps * self.stride
+            next_ = (steps + 1) * self.stride
+
+            if self.pool_type == "Avg":
+                y = ptf.avg_pool1d(
+                    x[..., :valid].unsqueeze(0),
+                    kernel_size=self.field,
+                    stride=self.stride,
+                ).squeeze(0)
+            elif self.pool_type == "Max":
+                y = ptf.max_pool1d(
+                    x[..., :valid].unsqueeze(0),
+                    kernel_size=self.field,
+                    stride=self.stride,
+                ).squeeze(0)
+
+            self.x_buffer.append(x[..., next_:])
+            self.x_length += max(x.shape[-1] - next_, 0)
+            self.x_skip = max(next_ - x.shape[-1], 0)
+
+        return y
+
+
 class Elementwise1dStream(BaseStream):
     def __init__(self, net: pt.nn.Module):
         super().__init__()
@@ -307,5 +369,13 @@ _stream_map: T.List[T.Tuple[type, T.Callable[[pt.nn.Module], BaseStream]]] = [
     (
         pt.nn.ConvTranspose1d,
         lambda net: convtranspose1d_stream(T.cast(pt.nn.ConvTranspose1d, net)),
+    ),
+    (
+        pt.nn.AvgPool1d,
+        lambda net: Pool1dStream(T.cast(pt.nn.AvgPool1d, net)),
+    ),
+    (
+        pt.nn.MaxPool1d,
+        lambda net: Pool1dStream(T.cast(pt.nn.MaxPool1d, net)),
     ),
 ]

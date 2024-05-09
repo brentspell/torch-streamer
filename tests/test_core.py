@@ -28,6 +28,8 @@ def test_sequential1d(
         pt.nn.Conv1d(CH, 2 * CH, kernel_size=3, dilation=2),
         pt.nn.Conv1d(2 * CH, CH, kernel_size=2),
         pt.nn.Conv1d(CH, CH, kernel_size=1, stride=2),
+        pt.nn.AvgPool1d(kernel_size=3, stride=2),
+        pt.nn.MaxPool1d(kernel_size=3, stride=2),
         pt.nn.ReLU(),
     )
 
@@ -153,6 +155,46 @@ def test_conv_transpose1d(
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
     assert pt.allclose(yc, ys, atol=1e-6)
+
+
+@hypothesis.given(
+    pool_type=hypstrat.sampled_from([pt.nn.AvgPool1d, pt.nn.MaxPool1d]),
+    kernel=hypstrat.integers(min_value=1, max_value=10),
+    stride=hypstrat.integers(min_value=1, max_value=10),
+    length=hypstrat.integers(min_value=0, max_value=20),
+    block=hypstrat.integers(min_value=1, max_value=10),
+    script=hypstrat.booleans(),
+)
+def test_pool1d(
+    pool_type: type,
+    kernel: int,
+    stride: int,
+    length: int,
+    block: int,
+    script: bool,
+) -> None:
+    length = max(length, kernel)
+
+    x = pt.randn([CH, length]).clamp(-1, 1)
+    m = pool_type(
+        kernel_size=kernel,
+        stride=stride,
+    )
+    s = pts.Pool1dStream(m)
+    assert repr(s).startswith(f"{pool_type.__name__}Stream")
+    if script:
+        s = pt.jit.script(s)
+
+    yc = m(x)
+    ys = do_stream(s, x, block)
+    assert ys.shape == yc.shape
+    assert pt.allclose(yc, ys, atol=1e-6)
+
+
+def test_pool1d_invalid() -> None:
+    with pytest.raises(ValueError, match=r"invalid_pool_module"):
+        m = pt.nn.Conv1d(CH, CH, kernel_size=1)
+        pts.Pool1dStream(T.cast(pt.nn.AvgPool1d, m))
 
 
 @hypothesis.given(
