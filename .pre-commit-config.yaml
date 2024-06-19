@@ -8,25 +8,16 @@ repos:
       - id: check-merge-conflict
   - repo: local
     hooks:
-      - id: black
-        name: black
+      - id: ruff-check
+        name: ruff-check
         language: system
-        entry: black
+        entry: ruff check --fix
         types: [python]
-      - id: isort
-        name: isort
+      - id: ruff-format
+        name: ruff-format
         language: system
-        entry: isort --profile=black
+        entry: ruff format
         types: [python]
-      - id: flake8
-        name: flake8
-        language: system
-        entry: flake8
-        types: [python]
-      - id: typos
-        name: typos
-        language: system
-        entry: typos
       - id: mypy
         name: mypy
         language: system

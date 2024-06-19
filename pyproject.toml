@@ -12,20 +12,18 @@ classifiers = [
    "Programming Language :: Python :: 3",
 ]
 dependencies = [
-   "numpy",
+   "numpy < 2",
    "torch",
    "torchaudio",
 ]
 optional-dependencies.dev = [
    # development
-   "black",
-   "flake8",
-   "isort",
    "mypy",
    "pre-commit",
    "pytest-watch",
+   "ruff",
+   "setuptools",
    "twine",
-   "typos",
    "wheel",
 
    # testing
@@ -36,11 +34,12 @@ optional-dependencies.dev = [
    "pytest-cov",
 ]
 
-
-
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+lint.extend-select = ["I"]
 
 [tool.mypy]
 check_untyped_defs = true

@@ -2,10 +2,13 @@
 
 set -e
 
-pip install --upgrade pip pip-tools
+pip install --upgrade uv
 
-pip-compile pyproject.toml \
+uv pip compile pyproject.toml \
   --extra dev \
+  --upgrade \
   -o requirements.txt
 
-pip-sync requirements.txt
+uv pip sync requirements.txt
+
+uv pip install -e .

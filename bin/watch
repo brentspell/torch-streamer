@@ -4,5 +4,5 @@ set -e
 
 exec python -m pytest_watch \
    --clear \
-   --beforerun "black --check . && flake8 . && mypy ." \
+   --beforerun "ruff check && mypy ." \
    -- -s --hypothesis-profile=default --cov=torchstreamer

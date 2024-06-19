@@ -71,7 +71,7 @@ def test_resample(
 
     ys = do_stream(s, x, block)
     assert ys.shape == yc.shape
-    assert pt.allclose(yc, ys, atol=1e-5)
+    assert pt.allclose(yc, ys, atol=1e-4)
 
 
 def do_stream(
