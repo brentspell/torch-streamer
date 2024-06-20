@@ -1,0 +1,7 @@
+#!/bin/sh
+
+set -e
+
+exec python -m mkdocs serve \
+   --dev-addr localhost:8001 \
+   -w torchstreamer

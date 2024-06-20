@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -9,6 +9,11 @@ uv pip compile pyproject.toml \
   --upgrade \
   -o requirements.txt
 
-uv pip sync requirements.txt
+uv pip compile pyproject.toml \
+  --extra docs \
+  --upgrade \
+  -o requirements_docs.txt
+
+uv pip sync requirements.txt requirements_docs.txt
 
 uv pip install -e .

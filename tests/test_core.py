@@ -4,6 +4,7 @@ import hypothesis
 import hypothesis.strategies as hypstrat
 import pytest
 import torch as pt
+import torch.nn as nn
 
 import torchstreamer as pts
 
@@ -21,16 +22,16 @@ def test_sequential1d(
     script: bool,
 ) -> None:
     x = pt.randn([CH, length]).clamp(-1, 1)
-    m = pt.nn.Sequential(
-        pt.nn.ConvTranspose1d(CH, CH, kernel_size=3, stride=2),
-        pt.nn.ConvTranspose1d(CH, CH, kernel_size=1),
-        pt.nn.Conv1d(CH, CH, kernel_size=1),
-        pt.nn.Conv1d(CH, 2 * CH, kernel_size=3, dilation=2),
-        pt.nn.Conv1d(2 * CH, CH, kernel_size=2),
-        pt.nn.Conv1d(CH, CH, kernel_size=1, stride=2),
-        pt.nn.AvgPool1d(kernel_size=3, stride=2),
-        pt.nn.MaxPool1d(kernel_size=3, stride=2),
-        pt.nn.ReLU(),
+    m = nn.Sequential(
+        nn.ConvTranspose1d(CH, CH, kernel_size=3, stride=2),
+        nn.ConvTranspose1d(CH, CH, kernel_size=1),
+        nn.Conv1d(CH, CH, kernel_size=1),
+        nn.Conv1d(CH, 2 * CH, kernel_size=3, dilation=2),
+        nn.Conv1d(2 * CH, CH, kernel_size=2),
+        nn.Conv1d(CH, CH, kernel_size=1, stride=2),
+        nn.AvgPool1d(kernel_size=3, stride=2),
+        nn.MaxPool1d(kernel_size=3, stride=2),
+        nn.ReLU(),
     )
 
     s = pts.Sequential1dStream(m)
@@ -55,10 +56,10 @@ def test_residual1d(
 ) -> None:
     x = pt.randn([CH, length]).clamp(-1, 1)
     m = pts.Residual1d(
-        pt.nn.Sequential(
-            pt.nn.Conv1d(CH, CH, kernel_size=1),
-            pt.nn.Conv1d(CH, CH, kernel_size=3, dilation=2),
-            pt.nn.Conv1d(CH, CH, kernel_size=2),
+        nn.Sequential(
+            nn.Conv1d(CH, CH, kernel_size=1),
+            nn.Conv1d(CH, CH, kernel_size=3, dilation=2),
+            nn.Conv1d(CH, CH, kernel_size=2),
         )
     )
 
@@ -74,7 +75,7 @@ def test_residual1d(
 
 def test_residual1d_invalid() -> None:
     with pytest.raises(ValueError, match=r"invalid_residual_stride"):
-        pts.Residual1d(pt.nn.Conv1d(CH, CH, kernel_size=1, stride=2))
+        pts.Residual1d(nn.Conv1d(CH, CH, kernel_size=1, stride=2))
 
 
 @hypothesis.given(
@@ -98,7 +99,7 @@ def test_conv1d(
     length = max(length, dilation * (kernel - 1) + 1)
 
     x = pt.randn([CH, length]).clamp(-1, 1)
-    m = pt.nn.Conv1d(
+    m = nn.Conv1d(
         CH,
         CH,
         kernel_size=kernel,
@@ -137,7 +138,7 @@ def test_conv_transpose1d(
     script: bool,
 ) -> None:
     x = pt.randn([CH, length]).clamp(-1, 1)
-    m = pt.nn.ConvTranspose1d(
+    m = nn.ConvTranspose1d(
         CH,
         CH,
         kernel_size=kernel,
@@ -158,7 +159,7 @@ def test_conv_transpose1d(
 
 
 @hypothesis.given(
-    pool_type=hypstrat.sampled_from([pt.nn.AvgPool1d, pt.nn.MaxPool1d]),
+    pool_type=hypstrat.sampled_from([nn.AvgPool1d, nn.MaxPool1d]),
     kernel=hypstrat.integers(min_value=1, max_value=10),
     stride=hypstrat.integers(min_value=1, max_value=10),
     length=hypstrat.integers(min_value=0, max_value=20),
@@ -193,8 +194,8 @@ def test_pool1d(
 
 def test_pool1d_invalid() -> None:
     with pytest.raises(ValueError, match=r"invalid_pool_module"):
-        m = pt.nn.Conv1d(CH, CH, kernel_size=1)
-        pts.Pool1dStream(T.cast(pt.nn.AvgPool1d, m))
+        m = nn.Conv1d(CH, CH, kernel_size=1)
+        pts.Pool1dStream(T.cast(nn.AvgPool1d, m))
 
 
 @hypothesis.given(
@@ -208,7 +209,7 @@ def test_elementwise1d(
     script: bool,
 ) -> None:
     x = pt.randn([CH, length]).clamp(-1, 1)
-    m = pt.nn.Conv1d(CH, CH, kernel_size=1)
+    m = nn.Conv1d(CH, CH, kernel_size=1)
     s = pts.Elementwise1dStream(m)
     if script:
         s = pt.jit.script(s)
@@ -220,7 +221,7 @@ def test_elementwise1d(
 
 
 def test_elementwise1d_invalid() -> None:
-    m = pt.nn.Conv1d(CH, CH, kernel_size=2)
+    m = nn.Conv1d(CH, CH, kernel_size=2)
     s = pts.Elementwise1dStream(m)
 
     with pytest.raises(RuntimeError, match=r"invalid_elementwise_output"):
@@ -228,8 +229,8 @@ def test_elementwise1d_invalid() -> None:
 
 
 def test_custom() -> None:
-    class MyResBlock(pt.nn.Module):
-        def __init__(self, inner: pt.nn.Module):
+    class MyResBlock(nn.Module):
+        def __init__(self, inner: nn.Module):
             super().__init__()
             self.inner = inner
 
@@ -240,15 +241,15 @@ def test_custom() -> None:
     pts.register_streamer(MyResBlock, lambda net: pts.Residual1dStream(net.inner))
 
     x = pt.randn([CH, 10])
-    m = pt.nn.Sequential(
-        pt.nn.Conv1d(CH, CH, kernel_size=1),
+    m = nn.Sequential(
+        nn.Conv1d(CH, CH, kernel_size=1),
         MyResBlock(
-            pt.nn.Sequential(
-                pt.nn.Conv1d(CH, CH, kernel_size=3, padding=1),
-                pt.nn.Conv1d(CH, CH, kernel_size=5, padding=2),
+            nn.Sequential(
+                nn.Conv1d(CH, CH, kernel_size=3, padding=1),
+                nn.Conv1d(CH, CH, kernel_size=5, padding=2),
             )
         ),
-        pt.nn.Conv1d(CH, CH, kernel_size=1),
+        nn.Conv1d(CH, CH, kernel_size=1),
     )
     s = pts.Sequential1dStream(m)
 
@@ -259,7 +260,7 @@ def test_custom() -> None:
 
 
 def do_stream(
-    stream: T.Union[pts.BaseStream, pt.jit.ScriptModule],
+    stream: pts.BaseStream | pt.jit.ScriptModule,
     x: pt.Tensor,
     b: int,
 ) -> pt.Tensor:

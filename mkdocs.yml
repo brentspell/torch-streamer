@@ -1,0 +1,19 @@
+site_name: Torch-Streamer
+
+theme:
+  name: "readthedocs"
+
+extra_css:
+  - style.css
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_source: false
+          show_root_heading: true
+          show_root_toc_entry: false
+          show_bases: false
+          members_order: "source"

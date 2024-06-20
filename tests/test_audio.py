@@ -1,5 +1,3 @@
-import typing as T
-
 import hypothesis
 import hypothesis.strategies as hypstrat
 import torch as pt
@@ -75,7 +73,7 @@ def test_resample(
 
 
 def do_stream(
-    stream: T.Union[pts.BaseStream, pt.jit.ScriptModule],
+    stream: pts.BaseStream | pt.jit.ScriptModule,
     x: pt.Tensor,
     b: int,
 ) -> pt.Tensor:

@@ -1,0 +1,8 @@
+.doc-class, .doc-function {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e1e4e5;
+}
+
+.doc-class .doc-function {
+    border: 0;
+}
