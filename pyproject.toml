@@ -19,6 +19,7 @@ dependencies = [
 ]
 optional-dependencies.dev = [
    # development
+   "build",
    "mypy",
    "pre-commit",
    "pytest-watch",

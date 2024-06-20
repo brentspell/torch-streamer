@@ -4,6 +4,8 @@ attrs==23.2.0
     # via hypothesis
 backports-tarfile==1.2.0
     # via jaraco-context
+build==1.2.1
+    # via torch-streamer (pyproject.toml)
 certifi==2024.6.2
     # via requests
 cfgv==3.4.0
@@ -38,7 +40,7 @@ identify==2.5.36
     # via pre-commit
 idna==3.7
     # via requests
-importlib-metadata==7.1.0
+importlib-metadata==7.2.0
     # via
     #   keyring
     #   twine
@@ -79,7 +81,9 @@ nodeenv==1.9.1
 numpy==1.26.4
     # via torch-streamer (pyproject.toml)
 packaging==24.1
-    # via pytest
+    # via
+    #   build
+    #   pytest
 pkginfo==1.11.1
     # via twine
 platformdirs==4.2.2
@@ -94,6 +98,8 @@ pygments==2.18.0
     # via
     #   readme-renderer
     #   rich
+pyproject-hooks==1.1.0
+    # via build
 pytest==8.2.2
     # via
     #   torch-streamer (pyproject.toml)
@@ -121,7 +127,7 @@ rfc3986==2.0.0
     # via twine
 rich==13.7.1
     # via twine
-ruff==0.4.9
+ruff==0.4.10
     # via torch-streamer (pyproject.toml)
 setuptools==70.1.0
     # via torch-streamer (pyproject.toml)
