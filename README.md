@@ -6,11 +6,19 @@ without padding or pseudo-streaming/cross-fading.
 [![PyPI](https://badge.fury.io/py/torch-streamer.svg)](https://badge.fury.io/py/torch-streamer)
 ![Tests](https://github.com/brentspell/torch-streamer/actions/workflows/test.yml/badge.svg)
 [![Coveralls](https://coveralls.io/repos/github/brentspell/torch-streamer/badge.svg?branch=main)](https://coveralls.io/repos/github/brentspell/torch-streamer/badge.svg?branch=main)
+[![Docs](https://readthedocs.org/projects/torch-streamer/badge/?version=latest)](https://torch-streamer.readthedocs.io/en/latest/?badge=latest)
+
+## Usage
 
 ### Install with pip
 ```bash
 pip install torch-streamer
 ```
+
+### Documentation
+
+Docs are available at
+[torch-streamer.readthedocs.io](https://torch-streamer.readthedocs.io/en/latest).
 
 ## License
 Copyright © 2024 Brent M. Spell
