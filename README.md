@@ -3,7 +3,7 @@ This package implements a framework for streaming 1D convolutions in PyTorch
 without padding or pseudo-streaming/cross-fading.
 
 ## Status
-[![PyPI](https://badge.fury.io/py/torch-streamer.svg)](https://badge.fury.io/py/torch-streamer)
+[![PyPI](https://img.shields.io/pypi/v/torch-streamer.svg)](https://pypi.org/project/torch-streamer)
 [![Tests](https://github.com/brentspell/torch-streamer/actions/workflows/test.yml/badge.svg)](https://github.com/brentspell/torch-streamer/actions/workflows/test.yml)
 [![Coveralls](https://coveralls.io/repos/github/brentspell/torch-streamer/badge.svg?branch=main)](https://coveralls.io/github/brentspell/torch-streamer?branch=main)
 [![Docs](https://readthedocs.org/projects/torch-streamer/badge/?version=latest)](https://torch-streamer.readthedocs.io/en/latest/?badge=latest)
