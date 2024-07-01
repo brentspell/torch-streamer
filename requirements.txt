@@ -14,7 +14,7 @@ charset-normalizer==3.3.2
     # via requests
 colorama==0.4.6
     # via pytest-watch
-coverage==7.5.3
+coverage==7.5.4
     # via
     #   coveralls
     #   pytest-cov
@@ -28,19 +28,19 @@ docopt==0.6.2
     #   pytest-watch
 docutils==0.21.2
     # via readme-renderer
-filelock==3.15.3
+filelock==3.15.4
     # via
     #   torch
     #   virtualenv
-fsspec==2024.6.0
+fsspec==2024.6.1
     # via torch
-hypothesis==6.103.2
+hypothesis==6.104.2
     # via torch-streamer (pyproject.toml)
 identify==2.5.36
     # via pre-commit
 idna==3.7
     # via requests
-importlib-metadata==7.2.0
+importlib-metadata==8.0.0
     # via
     #   keyring
     #   twine
@@ -68,7 +68,7 @@ more-itertools==10.3.0
     #   jaraco-functools
 mpmath==1.3.0
     # via sympy
-mypy==1.10.0
+mypy==1.10.1
     # via torch-streamer (pyproject.toml)
 mypy-extensions==1.0.0
     # via mypy
@@ -84,7 +84,7 @@ packaging==24.1
     # via
     #   build
     #   pytest
-pkginfo==1.11.1
+pkginfo==1.10.0
     # via twine
 platformdirs==4.2.2
     # via virtualenv
@@ -127,9 +127,9 @@ rfc3986==2.0.0
     # via twine
 rich==13.7.1
     # via twine
-ruff==0.4.10
+ruff==0.5.0
     # via torch-streamer (pyproject.toml)
-setuptools==70.1.0
+setuptools==70.2.0
     # via torch-streamer (pyproject.toml)
 sortedcontainers==2.4.0
     # via hypothesis
@@ -141,7 +141,7 @@ torch==2.2.2
     #   torchaudio
 torchaudio==2.2.2
     # via torch-streamer (pyproject.toml)
-twine==5.1.0
+twine==5.1.1
     # via torch-streamer (pyproject.toml)
 typing-extensions==4.12.2
     # via
@@ -151,7 +151,7 @@ urllib3==2.2.2
     # via
     #   requests
     #   twine
-virtualenv==20.26.2
+virtualenv==20.26.3
     # via pre-commit
 watchdog==4.0.1
     # via pytest-watch

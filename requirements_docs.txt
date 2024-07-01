@@ -6,9 +6,9 @@ click==8.1.7
     #   mkdocstrings
 colorama==0.4.6
     # via griffe
-filelock==3.15.3
+filelock==3.15.4
     # via torch
-fsspec==2024.6.0
+fsspec==2024.6.1
     # via torch
 ghp-import==2.1.0
     # via mkdocs

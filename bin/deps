@@ -2,7 +2,7 @@
 
 set -e
 
-pip install --upgrade uv
+pip install --upgrade pip uv
 
 uv pip compile pyproject.toml \
   --extra dev \
