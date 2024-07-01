@@ -78,8 +78,6 @@ nh3==0.2.17
     # via readme-renderer
 nodeenv==1.9.1
     # via pre-commit
-numpy==1.26.4
-    # via torch-streamer (pyproject.toml)
 packaging==24.1
     # via
     #   build

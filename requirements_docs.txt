@@ -54,8 +54,6 @@ mpmath==1.3.0
     # via sympy
 networkx==3.3
     # via torch
-numpy==1.26.4
-    # via torch-streamer (pyproject.toml)
 packaging==24.1
     # via mkdocs
 pathspec==0.12.1
