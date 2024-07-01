@@ -20,6 +20,67 @@ pip install torch-streamer
 Docs are available at
 [torch-streamer.readthedocs.io](https://torch-streamer.readthedocs.io/en/latest).
 
+## Development
+
+### Setup
+The following script creates a virtual environment using
+[pyenv](https://github.com/pyenv/pyenv) for the project and installs
+dependencies with [uv](https://pypi.org/project/uv/).
+
+```bash
+pyenv install 3.10
+pyenv virtualenv 3.10 torch-streamer
+bin/deps
+```
+
+You can also use [pre-commit](https://pre-commit.com/) with the project to
+run tests, etc. at commit time.
+
+```bash
+pre-commit install
+```
+
+### Testing
+Testing, formatting, and static checking can all be done with pre-commit at
+any time.
+
+```bash
+pre-commit run --all-files
+```
+
+There is also a watcher script that can be used to run these whenever a file
+changes.
+
+```bash
+bin/watch
+```
+
+### Documentation
+The project uses [MkDocs](https://www.mkdocs.org/) with
+[mkdocstrings](https://mkdocstrings.github.io/python/) for documentation, and
+you can start a mkdocs web server to test/edit documentation as follows.
+
+```bash
+bin/docserve
+```
+
+Documentation is hosted by
+[Read the Docs](https://torch-streamer.readthedocs.io/en/latest) and will
+automatically update when the main branch is merged.
+
+### Releasing
+The library can be updated on the main PyPI repository as follows.
+
+```bash
+bin/release pypi
+```
+
+If needed, you can release to the test PyPI repository with this command.
+
+```
+bin/release pypi-test
+```
+
 ## License
 Copyright © 2024 Brent M. Spell
 
